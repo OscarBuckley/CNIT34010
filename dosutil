@@ -175,7 +175,7 @@ copy!)
 			fi	
 		;;
 		2)
-		cp -rf $ARGUMENT1 $ARGUMENT2 2> /dev/null
+		cp -Rft $ARGUMENT1 $ARGUMENT2 2> /dev/null
 
 			if [ $? == 0 ]; then
 
@@ -245,37 +245,25 @@ ren!)
 		echo "Where $ARGUMENT1 is a valid filename"
 		echo "And $ARGUMENT2 is the new name of the file"
 
-	VERIFY $ARGUMENT1
+		VERIFY $ARGUMENT1
 
-	if [ $RETURN == 0 ]; then
+		if [ $RETURN == 0 ]; then
+		echo "$ARGUMENT1 does not exist"
+		echo "Function Not Executed"
+		else
 
-	echo "$ARGUMENT1 does not exist"
-	echo "Function Not Executed"
-
-	else
-
-		VERIFY $ARGUMENT2
-
-		case $RETURN in
-		0)
 		mv -f $ARGUMENT1 $ARGUMENT2 2> /dev/null
+
 			if [ $? == 0 ]; then
 
-				echo "File successfully renamed"
+				echo "File successfully moved"
 
 			else 
 
-				echo "An error has occured. File not successfully renamed"
+				echo "An error has occured. File not successfully moved"
 
 			fi	
-		;;
-
-		2)
-		echo "File 2 is a directory, and this will not rename the file"
-		echo "Function not executed"
-		;;
-		esac
-	fi
+		fi
 ;;
 
 move)
