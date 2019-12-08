@@ -175,7 +175,7 @@ copy!)
 			fi	
 		;;
 		2)
-		cp -Rft $ARGUMENT1 $ARGUMENT2 2> /dev/null
+		cp -rf $ARGUMENT1 $ARGUMENT2 2> /dev/null
 
 			if [ $? == 0 ]; then
 
@@ -413,6 +413,8 @@ sort_size);;
 	echo "Use './dosutil ren filename newname' to rename a file to 'newname' where filename is an existing file."
 	echo "Use './dosutil move filename filepath' to rename a file to filepath where filename is an existing file."
 	echo "Use './dosutil del filename' to delete a file where filename is an existing file."
+	echo "Use './dosutil whereami' to see the current directory."
+	echo "Use './dosutil cd to change directory."
 	echo "Use './dosutil help' to see the help page."
 	echo "All other invalid parameters for the above commands will show the HELP page"
 
