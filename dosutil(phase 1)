@@ -1,0 +1,253 @@
+#!/bin/bash
+
+##Oscar Wong
+##Script is for Project 2 phase 1 of CNIT34010
+##Last Revision DAte 16 November 2019
+##List of VAriables:
+##RETURN: Return value for file verification
+##SELECT: Selection for which command to use
+##AGRUMENT1: First Parameter in the statement
+##AGRUMENT2: Second Parameter in the statement
+##FILE: Parameter for target file in VERIFY() Function
+
+RETURN=-1
+
+##Function for command success
+function SUCC(){
+	if [ $1 == 0 ]; then
+
+		echo "Function successfully ran."
+
+	else 
+
+		echo "An error has occured. File not successfully ran"
+
+	fi	
+}
+
+##Function for verifying files and directories
+function VERIFY(){
+
+	FILE=$1
+
+#File Does not Exist
+	if [ ! -f $FILE ]; then
+	RETURN=0
+	fi
+
+#File Exists
+	if [ -f $FILE ]; then
+	RETURN=1
+	fi
+
+#File is Directory
+	if [ -d $FILE ]; then
+	RETURN=2
+	fi
+}
+
+##Main Function for Case Statements
+function COMMAND(){
+
+SELECT=$1
+ARGUMENT1=$2
+ARGUMENT2=$3
+
+case $SELECT in
+
+author)
+	echo 'Wong, Oscar'
+	;;
+
+type)
+#Execute if $2 is File
+#Do not execute if $2 is directory or does not exist
+
+		echo "The UNIX Command to show a file's content is: cat $ARGUMENT1"
+		echo "Where $ARGUMENT1 is a valid filename"
+
+	VERIFY $ARGUMENT1
+
+	case $RETURN in
+	0)
+	echo "$ARGUMENT1 does not exist"
+	echo "Function Not Executed"
+	;;
+	1)
+	cat $ARGUMENT1 2> /dev/null
+	SUCC $?	
+	;;
+	2)
+	echo "$ARGUMENT1 is a directory"
+	echo "Function Not Executed"
+	;;
+	esac
+
+;;
+
+copy)
+#Execute if ARGUMENT1 exists
+#Do not execute if ARGUMENT1 does not exist
+#Recursive Copy if ARGUMENT1 is a directory
+#Do not execute if ARGUMENT 2 is a file
+
+
+
+		echo "The UNIX Command to copy a file is: cp $ARGUMENT1 $ARGUMENT2"
+		echo "Where filename is a valid filename"
+		echo "And copyname is the name of the copy"
+		echo "The -r flag is added if $ARGUMENT1 is a directory to copy recursively"
+		echo "If $ARGUMENT2 is a directory a copy of the file will be made in $ARGUMENT2"
+
+	VERIFY $ARGUMENT2
+ 	if [ $RETURN != 1 ]; then
+
+		VERIFY $ARGUMENT1
+
+		case $RETURN in
+		0)
+		echo "$ARGUMENT1 does not exist"
+		echo "Function Not Executed"
+		;;
+		1)
+		cp $ARGUMENT1 $ARGUMENT2 2> /dev/null
+		SUCC $?	
+		;;
+		2)
+		cp -r $ARGUMENT1 $ARGUMENT2 2> /dev/null
+		SUCC $?		
+		;;
+		esac
+
+	else
+	echo "$ARGUMENT2 is an existing file and will be overwritten"
+	echo "Function Not Executed"
+	fi
+;;
+
+ren)
+#Do not execute if file does not exist
+#Execute if file exists
+#Do not execute if file 2 exists
+
+		echo "The UNIX Command to rename a file is: mv $ARGUMENT1 $ARGUMENT2"
+		echo "Where $ARGUMENT1 is a valid filename"
+		echo "And $ARGUMENT2 is the new name of the file"
+
+	VERIFY $ARGUMENT1
+
+	if [ $RETURN == 0 ]; then
+
+	echo "$ARGUMENT1 does not exist"
+	echo "Function Not Executed"
+
+	else
+
+		VERIFY $ARGUMENT2
+
+		case $RETURN in
+		0)
+		mv $ARGUMENT1 $ARGUMENT2 2> /dev/null
+		SUCC $?		
+		;;
+		1)
+		echo "File 2 will be overwritten"
+		echo "Function not executed"
+		;;
+		2)
+		echo "File 2 is a directory, and this will not rename the file"
+		echo "Function not executed"
+		;;
+		esac
+	fi
+;;
+
+move)
+#Do not execute if ARGUMENT1 is not a file
+#Recursive Copy if ARGUMENT1 is a directory
+#Do not execute if ARGUMENT2 is a file
+
+		echo "The UNIX Command to move a file is: mv $ARGUMENT1 $ARGUMENT2"
+		echo "Where $ARGUMENT1 is a valid filename"
+		echo "And $ARGUMENT2 is a valid filepath"
+
+	VERIFY $ARGUMENT2
+
+	if [ $RETURN == 1 ]; then
+
+	echo "$ARGUMENT2 is an existing file that will be overwritten"
+	echo "Function not executed"
+
+	else
+		VERIFY $ARGUMENT1
+
+		if [ $RETURN == 0 ]; then
+		echo "$ARGUMENT1 does not exist"
+		echo "Function Not Executed"
+		else
+
+		mv $ARGUMENT1 $ARGUMENT2 2> /dev/null
+		SUCC $?		
+		fi
+
+	fi
+;;
+
+del)
+#Execute if file exists
+#Do not execute if file does not exist
+#Recursive Delete if File is a directory
+
+		echo "The UNIX Command to delete a file is: $ARGUMENT1"
+		echo "Where $ARGUMENT1 is a valid filename"
+		echo "The -r flag is added if $ARGUMENT1 is a directory to delete recursively"
+
+	VERIFY $ARGUMENT1
+
+	case $RETURN in
+	0)
+	echo "$ARGUMENT1 does not exist"
+	echo "Function Not Executed"
+	;;
+	1)
+	rm $ARGUMENT1 > /dev/null
+	SUCC $?
+	;;
+	2)
+	rm -r $ARGUMENT1 > /dev/null
+	SUCC $?
+	;;
+	esac
+;;
+
+help)
+	echo "THIS IS THE HELP PAGE"
+	echo "Use './dosutil author' to show the author's name"
+	echo "Use './dosutil type filename' to show the contents of a file where filename is an existing file."
+	echo "Use './dosutil copy filename copyname' to copy a file where filename is an existing file and copyname is the copy's name."
+	echo "Use './dosutil ren filename newname' to rename a file to 'newname' where filename is an existing file."
+	echo "Use './dosutil move filename filepath' to rename a file to filepath where filename is an existing file."
+	echo "Use './dosutil del filename' to delete a file where filename is an existing file."
+	echo "Use './dosutil help' to see the help page."
+	echo "All other invalid parameters for the above commands will show the HELP page"
+
+
+;;
+
+*)
+	echo "THIS IS THE HELP PAGE"
+	echo "Use './dosutil author' to show the author's name"
+	echo "Use './dosutil type filename' to show the contents of a file where filename is an existing file."
+	echo "Use './dosutil copy filename copyname' to copy a file where filename is an existing file and copyname is the copy's name."
+	echo "Use './dosutil ren filename newname' to rename a file to 'newname' where filename is an existing file."
+	echo "Use './dosutil move filename filepath' to rename a file to filepath where filename is an existing file."
+	echo "Use './dosutil del filename' to delete a file where filename is an existing file."
+	echo "Use './dosutil help' to see the help page."
+	echo "All other invalid parameters for the above commands will show the HELP page"
+
+;;
+esac
+
+}
+
+COMMAND $1 $2 $3
